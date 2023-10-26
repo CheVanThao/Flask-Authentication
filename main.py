@@ -12,7 +12,7 @@ secrets_key = os.environ.get('SECRET_KEY')
 database_url = os.environ.get('DATABASE_URI')
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = secrets_key
+app.config['SECRET_KEY'] = "2b1ea3556334e37b5046e6896fd0c96247417fd3e29bee060d1c49171370e49d"
 
 # CONNECT TO DB
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
@@ -76,20 +76,24 @@ def register():
 
 @app.route('/login', methods=["GET", "POST"])
 def login():
-    email = request.form.get('email')
-    password = request.form.get('password')
-    # Retrieve user from the database based on the provided email
-    user = User.query.filter_by(email=email).first()
+    if request.method == "POST":
+        email = request.form.get('email')
+        password = request.form.get('password')
+        # Retrieve user from the database based on the provided email
+        user = User.query.filter_by(email=email).first()
 
-    if user and check_password_hash(user.password, password):
-        # Password is correct
-        flash('Login successful!', 'success')
-        login_user(user)
-        return render_template('secrets.html', email=email, name=user.name)
-    else:
-        # Invalid credentials
-        flash('Login failed. Check your email and password.', 'danger')
-
+        if user and check_password_hash(user.password, password):
+            # Password is correct
+            flash('Login successful!', 'success')
+            login_user(user)
+            return url_for('secrets', email=email, name=user.name)
+        elif not user:
+            # Invalid credentials
+            flash('Login failed. Check your email.', 'danger')
+            return redirect(url_for('login'))
+        else:
+            flash('Login failed. Check your password.', 'danger')
+            return redirect(url_for('login'))
     return render_template("login.html")
 
 
