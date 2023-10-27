@@ -8,11 +8,11 @@ import os
 
 # Load environment variables from .env
 load_dotenv()
-secrets_key = os.environ.get('SECRET_KEY')
+secrets_key = os.environ.get('SECRETS_KEY')
 database_url = os.environ.get('DATABASE_URI')
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = "2b1ea3556334e37b5046e6896fd0c96247417fd3e29bee060d1c49171370e49d"
+app.config['SECRET_KEY'] = secrets_key
 
 # CONNECT TO DB
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
@@ -95,7 +95,7 @@ def login():
             # Password is correct
             flash('Login successful!', 'success')
             login_user(user)
-            return url_for('secrets', email=email, name=user.name)
+            return redirect(url_for('secrets', email=email, name=user.name))
         elif not user:
             # Invalid credentials
             flash('Login failed. Check your email.', 'danger')
